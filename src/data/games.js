@@ -903,6 +903,7 @@ function groupStageGames() {
   ];
 }
 
+/*
 function getPrediction(predictions, gameId) {
   const prediction = predictions?.[gameId];
 
@@ -1304,9 +1305,9 @@ function knockoutGames(startNumber, predictions = {}, standingsByGroup = null) {
 
   return games;
 }
-
+*/
 const groupGames = groupStageGames();
-
+/*
 export function getGamesWithUpdatedKnockout(predictions = {}) {
   const standingsByGroup = calculateGroupStandings(groupGames, predictions);
   const knockout = knockoutGames(groupGames.length + 1, predictions, standingsByGroup);
@@ -1319,5 +1320,5 @@ export function getStandings(predictions = {}) {
 }
 
 export const games = getGamesWithUpdatedKnockout({});
-
-export default games;
+*/
+export default groupGames
