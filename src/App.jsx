@@ -467,7 +467,7 @@ export default function App() {
             type="text"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="Ex.: Ariano"
+            placeholder="Ex.: João"
           />
         </label>
 
