@@ -557,3 +557,33 @@ button:hover { transform: translateY(-1px); filter: brightness(1.02); }
   font-weight: 600;
   color: #687083;
 }
+
+.legal-disclaimer {
+  text-align: center;
+  padding: 32px 20px 0;
+  margin-top: 40px;
+  border-top: 1px solid rgba(6, 28, 64, 0.08);
+  color: #687083; /* Mesma cor usada nos textos de apoio do app */
+  font-size: 0.75rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.legal-disclaimer p {
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+ .legal-text {
+  margin-bottom: 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #ff0000;
+  text-align:center;
+  line-height: 1.4;
+  border: 1px solid red;
+  border-radius: 20px;
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+  background-color: #ffffff;
+}

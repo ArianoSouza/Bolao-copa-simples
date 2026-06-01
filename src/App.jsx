@@ -438,6 +438,10 @@ export default function App() {
 
   return (
     <main className="page">
+
+            <p className="legal-text">
+            * Esse site não é ligado a nenhum meio oficial da FIFA e não visa criar ou incentivar apostas esportivas. Nenhum dado é coletado a partir desse site.
+        </p>
       <header className="hero">
         <div className="hero-copy">
           <span className="eyebrow">Bolão oficial da galera</span>
@@ -453,6 +457,8 @@ export default function App() {
           <span>de {games.length} jogos preenchidos</span>
         </div>
       </header>
+
+
 
       <section className="controls">
         <label>
@@ -610,7 +616,7 @@ export default function App() {
         <div className="export-canvas-optimized" ref={exportRef}>
           <header className="export-header-optimized">
             <div className="header-titles">
-              <span className="eyebrow-optimized">Bolão Oficial • Copa do Mundo FIFA 2026</span>
+              <span className="eyebrow-optimized">BolãoZÃO • Copa do Mundo FIFA 2026</span>
               <h1>{name ? `Palpites de ${name}` : 'Meus Palpites'}</h1>
             </div>
             <div className="header-stats">
@@ -670,7 +676,7 @@ export default function App() {
           </div>
           
           <footer className="export-footer">
-            Gerado automaticamente • Bolão Copa 2026
+            Gerado automaticamente • Bolão NÃO OFICIAL Copa 2026 • Esse site não é ligado a nenhum meio oficial da FIFA e não visa incentivar apostas esportivas. 
           </footer>
         </div>
       </div>
