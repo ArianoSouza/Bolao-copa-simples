@@ -587,3 +587,162 @@ button:hover { transform: translateY(-1px); filter: brightness(1.02); }
   padding-top: 0.5rem;
   background-color: #ffffff;
 }
+
+/* =========================================
+   ABAS (TABS) E RESULTADOS
+   ========================================= */
+
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(6, 28, 64, 0.08);
+}
+
+.tab-button {
+  flex: 1;
+  background: transparent;
+  color: #687083;
+  height: 54px;
+  font-size: 1.05rem;
+  transition: all 0.2s ease;
+}
+
+.tab-button.active {
+  background: #061c40;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(6, 28, 64, 0.15);
+}
+
+.comparison-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comparison-blocks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.score-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px;
+  background: #f8f5ec;
+  border-radius: 12px;
+  border: 1px solid #e5ddcf;
+}
+
+.score-block .label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: #687083;
+}
+
+.score-block strong {
+  font-size: 1.2rem;
+  color: #061c40;
+}
+
+.score-block.real {
+  background: #f0f7f4;
+  border: 1px solid #cce5da;
+}
+
+.score-block.real .label {
+  color: #009d57;
+}
+
+.game-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px dashed #e5ddcf;
+}
+
+.teams-comparison {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #061c40;
+}
+
+.points-badge {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.points-badge.pending { background: #e9e3d6; color: #687083; }
+.points-badge.exact { background: #009d57; color: #fff; }
+.points-badge.partial { background: #ffb81c; color: #061c40; }
+.points-badge.wrong { background: #de202b; color: #fff; }
+
+@media (max-width: 640px) {
+  .comparison-blocks { grid-template-columns: 1fr; }
+  .tabs { flex-direction: column; }
+}
+/* =========================================
+   CONTROLES DE RESULTADOS (IMPORT/EXPORT)
+   ========================================= */
+
+.results-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(6, 28, 64, 0.08);
+}
+
+.import-file-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 15px;
+  font-weight: 950;
+  font-size: 0.88rem;
+  cursor: pointer;
+  background: #e9e3d6;
+  color: #061c40;
+  transition: filter 0.2s ease, transform 0.2s ease;
+  margin: 0;
+}
+
+.import-file-button:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+}
+
+/* Esconde o input nativo feio, deixando só o label clicável como botão */
+.import-file-button input[type="file"] {
+  display: none; 
+}
+
+.total-points-badge {
+  background: #009d57;
+  border-color: #007a44;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 640px) {
+  .results-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
