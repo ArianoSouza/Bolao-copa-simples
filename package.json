@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
+    "html-to-image": "^1.11.13",
+    "jspdf": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "jspdf": "latest"
-  },
-  "devDependencies": {}
+    "vite": "latest"
+  }
 }

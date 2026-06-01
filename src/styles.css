@@ -361,3 +361,199 @@ button:hover { transform: translateY(-1px); filter: brightness(1.02); }
     font-size: .86rem;
   }
 }
+/* =========================================
+   CANVAS DE EXPORTAÇÃO (1920x1080)
+   ========================================= */
+
+/* =========================================
+   CANVAS DE EXPORTAÇÃO (INFOGRÁFICO VERTICAL)
+   ========================================= */
+
+.export-hidden-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1200px;
+  z-index: -9999; /* Joga para trás de todo o site */
+  opacity: 0; /* Deixa invisível para o usuário */
+  pointer-events: none; /* Impede que o usuário clique nele sem querer */
+  max-width: none; /* Evita que o navegador tente espremer a div */
+}
+
+.export-canvas-optimized {
+  width: 1200px;
+  height: auto; /* Cresce conforme o conteúdo */
+  background: #f8f5ec; /* Mantendo o fundo claro e elegante da sua UI principal */
+  color: #141821;
+  padding: 60px 80px;
+  font-family: Inter, system-ui, sans-serif;
+  box-sizing: border-box;
+}
+
+.export-header-optimized {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 4px solid #061c40;
+}
+
+.eyebrow-optimized {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #de202b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.header-titles h1 {
+  margin: 8px 0 0;
+  font-size: 3.5rem;
+  color: #061c40;
+  letter-spacing: -0.04em;
+}
+
+.header-stats {
+  background: #061c40;
+  color: #fff;
+  padding: 16px 24px;
+  border-radius: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-stats strong {
+  font-size: 2.5rem;
+  line-height: 1;
+  color: #ffb81c;
+}
+
+.header-stats span {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.export-body-optimized {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.export-section-title {
+  font-size: 1.5rem;
+  color: #061c40;
+  text-transform: uppercase;
+  margin: 0 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.export-section-title::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: conic-gradient(#de202b, #ffb81c, #009d57, #0058b8, #de202b);
+}
+
+.export-grid-optimized {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 cards por linha */
+  gap: 20px;
+}
+
+.export-card {
+  background: #fff;
+  border: 1px solid #e5ddcf;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(6, 28, 64, 0.04);
+}
+
+.export-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #687083;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #e5ddcf;
+}
+
+.export-card-teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.export-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-team-right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.export-team .team-name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #061c40;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px; /* Evita quebrar o layout se o nome for gigante */
+}
+
+.export-team .flag {
+  font-size: 1.2rem;
+}
+
+.export-scores {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8f5ec;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.score-box {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #141821;
+  width: 24px;
+  text-align: center;
+}
+
+.score-divider {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #de202b;
+}
+
+.export-penalties {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5ddcf;
+  font-size: 0.8rem;
+  text-align: center;
+  color: #009d57;
+}
+
+.export-footer {
+  margin-top: 60px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #687083;
+}

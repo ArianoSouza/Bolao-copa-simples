@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react'; // Adicionado useRef
 import { jsPDF } from 'jspdf';
+import { toPng } from 'html-to-image';
 import { getGamesWithUpdatedKnockout } from './data/games';
 import { getTeamFlag } from './data/teams.js';
 
@@ -152,6 +153,7 @@ export default function App() {
   const [search, setSearch] = useState('');
   const [phaseFilter, setPhaseFilter] = useState('Todos');
   const [predictions, setPredictions] = useState({});
+  const exportRef = useRef(null);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -211,6 +213,23 @@ export default function App() {
     return isPredictionFilled(predictions[game.id]);
   }).length;
 }, [games, predictions]);
+
+
+  function exportImage() {
+    if (exportRef.current === null) return;
+
+    // Usamos um fundo padrão para evitar transparências indesejadas caso o fundo do DOM original não cubra tudo
+    toPng(exportRef.current, { cacheBust: true, backgroundColor: '#f8f5ec', width: 1400})
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.download = `bolao-copa-2026-${slugify(name || 'palpites')}.png`;
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch((err) => {
+        console.error('Erro ao exportar a imagem:', err);
+      });
+  }
 
   function updatePrediction(gameId, side, value) {
     const numericValue = value.replace(/[^0-9]/g, '').slice(0, 2);
@@ -474,6 +493,9 @@ export default function App() {
           <button className="primary" onClick={exportPdf}>
             Baixar PDF
           </button>
+          <button className="primary" onClick={exportImage} style={{ background: 'linear-gradient(135deg, #009d57, #34b373)' }}>
+            Baixar Imagem
+          </button>
 
           <button className="secondary" onClick={clearAll}>
             Limpar
@@ -583,6 +605,75 @@ export default function App() {
           </section>
         ))}
       </section>
+{/* NOVO: Canvas Oculto Otimizado (Infográfico Vertical) */}
+      <div className="export-hidden-wrapper">
+        <div className="export-canvas-optimized" ref={exportRef}>
+          <header className="export-header-optimized">
+            <div className="header-titles">
+              <span className="eyebrow-optimized">Bolão Oficial • Copa do Mundo FIFA 2026</span>
+              <h1>{name ? `Palpites de ${name}` : 'Meus Palpites'}</h1>
+            </div>
+            <div className="header-stats">
+              <strong>{completed}</strong>
+              <span>de {games.length} jogos</span>
+            </div>
+          </header>
+
+          <div className="export-body-optimized">
+            {Object.entries(sections).map(([sectionName, sectionGames]) => (
+              <div className="export-section" key={sectionName}>
+                <h3 className="export-section-title">
+                  <span>{sectionName}</span>
+                </h3>
+                
+                <div className="export-grid-optimized">
+                  {sectionGames.map((game) => {
+                    const prediction = predictions[game.id] || emptyPrediction();
+                    
+                    return (
+                      <div className="export-card" key={game.id}>
+                        <div className="export-card-meta">
+                          <span>Jogo {game.matchNumber}</span>
+                          <span>{formatDate(game.date)}</span>
+                        </div>
+                        
+                        <div className="export-card-teams">
+                          <div className="export-team">
+                            <span className="flag">{getTeamFlag(game.home).flag}</span>
+                            <span className="team-name">{game.home}</span>
+                          </div>
+                          
+                          <div className="export-scores">
+                            <div className="score-box">{prediction.home}</div>
+                            <span className="score-divider">x</span>
+                            <div className="score-box">{prediction.away}</div>
+                          </div>
+
+                          <div className="export-team export-team-right">
+                            <span className="team-name">{game.away}</span>
+                            <span className="flag">{getTeamFlag(game.away).flag}</span>
+                          </div>
+                        </div>
+
+                        {/* Mostra o vencedor dos pênaltis se houver */}
+                        {prediction.penaltyWinner && (
+                          <div className="export-penalties">
+                            Pênaltis: <strong>{prediction.penaltyWinner}</strong>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <footer className="export-footer">
+            Gerado automaticamente • Bolão Copa 2026
+          </footer>
+        </div>
+      </div>
     </main>
   );
 }
