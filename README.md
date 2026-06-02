@@ -9,6 +9,8 @@ npm install
 npm run dev
 ```
 
+ou acessando o link: https://bolao-copa-simples.vercel.app/
+
 ## Principais recursos
 
 - Formulário com jogos da Copa 2026.
