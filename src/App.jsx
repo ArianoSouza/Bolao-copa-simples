@@ -10,10 +10,6 @@ const STORAGE_KEY = 'bolao-copa-2026-palpites';
 // RESULTADOS OFICIAIS (Mock para Testes)
 // ==========================================
 const officialResults = {
-  'M1': { home: '2', away: '1' }, // México 2 x 1 África do Sul
-  'M2': { home: '1', away: '1' }, // Coreia do Sul 1 x 1 Tchéquia
-  'M3': { home: '0', away: '2' }, // Canadá 0 x 2 Bósnia e Herzegovina
-  'M4': { home: '3', away: '0' }  // Estados Unidos 3 x 0 Paraguai
 };
 
 function calculatePoints(prediction, result) {
