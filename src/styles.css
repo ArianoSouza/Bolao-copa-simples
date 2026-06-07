@@ -740,7 +740,51 @@ button:hover { transform: translateY(-1px); filter: brightness(1.02); }
   font-size: 1.2rem;
 }
 
+.scoring-info {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #fffdf8;
+  border: 1px solid #ffb81c;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(255, 184, 28, 0.1);
+}
+
+.scoring-info h4 {
+  margin: 0 0 12px;
+  color: #061c40;
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.scoring-info ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.scoring-info li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475162;
+}
+
+.scoring-info strong {
+  color: #061c40;
+  background: rgba(255, 184, 28, 0.15);
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
 @media (max-width: 640px) {
+  .scoring-info ul { flex-direction: column; gap: 8px; }
   .results-toolbar {
     flex-direction: column;
     align-items: stretch;
