@@ -10,7 +10,10 @@
 
 * { box-sizing: border-box; }
 
-body { margin: 0; }
+body { 
+  margin: 0; 
+  overflow-x: hidden; 
+}
 
 button, input, select { font: inherit; }
 
@@ -287,6 +290,10 @@ button:hover { transform: translateY(-1px); filter: brightness(1.02); }
   font-weight: 950;
   line-height: 1.2;
   color: #141821;
+  min-width: 0; /* Permite que o texto encolha */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .right { text-align: right; }
@@ -300,6 +307,7 @@ button:hover { transform: translateY(-1px); filter: brightness(1.02); }
   border-radius: 14px;
   border: 2px solid #e0d8c9;
   background: #ffffff;
+  width: 100%; /* Garante que o input preencha a coluna do grid */
 }
 
 .teams strong { text-align: center; color: #de202b; }
@@ -370,14 +378,13 @@ button:hover { transform: translateY(-1px); filter: brightness(1.02); }
    ========================================= */
 
 .export-hidden-wrapper {
-  position: absolute;
+  position: fixed; /* Mudei para fixed para não afetar o scroll */
   top: 0;
-  left: 0;
+  left: 200vw; /* Joga para bem longe da tela */
   width: 1200px;
-  z-index: -9999; /* Joga para trás de todo o site */
-  opacity: 0; /* Deixa invisível para o usuário */
-  pointer-events: none; /* Impede que o usuário clique nele sem querer */
-  max-width: none; /* Evita que o navegador tente espremer a div */
+  z-index: -9999;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .export-canvas-optimized {
