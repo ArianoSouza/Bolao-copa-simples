@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { jsPDF } from 'jspdf';
 import { toPng } from 'html-to-image';
-import games from './data/games';
+import groupGames, { getGamesWithUpdatedKnockout } from './data/games';
 import { getTeamFlag } from './data/teams.js';
 
 const STORAGE_KEY = 'bolao-copa-2026-palpites';
@@ -134,14 +134,23 @@ export default function App() {
   const [name, setName] = useState('');
   const [search, setSearch] = useState('');
   const [phaseFilter, setPhaseFilter] = useState('Todos');
+  const [roundFilter, setRoundFilter] = useState('Todos');
   const [predictions, setPredictions] = useState({});
   const [view, setView] = useState('palpites'); 
   const [importedData, setImportedData] = useState(null); 
   const exportRef = useRef(null);
 
-  // Variáveis ativas baseadas na importação (posicionadas no topo do componente)
+  // Variáveis ativas baseadas na importação
   const activePredictions = importedData?.predictions || predictions || {};
   const activeName = importedData?.name || name || '';
+
+  const allGames = useMemo(() => {
+    return getGamesWithUpdatedKnockout(predictions);
+  }, [predictions]);
+
+  const activeGames = useMemo(() => {
+    return importedData ? getGamesWithUpdatedKnockout(importedData.predictions) : allGames;
+  }, [importedData, allGames]);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -161,38 +170,45 @@ export default function App() {
   }, [name, predictions]);
 
   const phases = useMemo(() => {
-    return ['Todos', ...new Set(games.map((game) => game.phase))];
-  }, []);
+    return ['Todos', ...new Set(allGames.map((game) => game.phase))];
+  }, [allGames]);
+
+  const rounds = useMemo(() => {
+    const relevantGames = phaseFilter === 'Todos' 
+      ? allGames 
+      : allGames.filter(g => g.phase === phaseFilter);
+    return ['Todos', ...new Set(relevantGames.map((game) => game.round))];
+  }, [allGames, phaseFilter]);
 
   const filteredGames = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return games.filter((game) => {
+    const listToFilter = view === 'resultados' ? activeGames : allGames;
+    return listToFilter.filter((game) => {
       const matchPhase = phaseFilter === 'Todos' || game.phase === phaseFilter;
+      const matchRound = roundFilter === 'Todos' || game.round === roundFilter;
       const matchSearch = !term || [
         game.home, game.away, game.group, game.stadium, game.phase, game.round
       ].join(' ').toLowerCase().includes(term);
-      return matchPhase && matchSearch;
+      return matchPhase && matchRound && matchSearch;
     });
-  }, [search, phaseFilter]);
+  }, [allGames, activeGames, search, phaseFilter, roundFilter, view]);
 
   const sections = useMemo(() => {
     return groupBySection(filteredGames);
   }, [filteredGames]);
 
   const completed = useMemo(() => {
-    return games.filter((game) => isPredictionFilled(predictions[game.id])).length;
-  }, [predictions]);
+    return allGames.filter((game) => isPredictionFilled(predictions[game.id])).length;
+  }, [allGames, predictions]);
 
   const totalPoints = useMemo(() => {
     let sum = 0;
-    if (!games || !Array.isArray(games)) return 0;
-    
-    games.forEach((game) => {
+    activeGames.forEach((game) => {
       const pts = calculatePoints(activePredictions[game.id], officialResults[game.id]);
       if (pts) sum += pts;
     });
     return sum;
-  }, [activePredictions]);
+  }, [activeGames, activePredictions]);
 
   function exportJson() {
     const dataToExport = {
@@ -225,12 +241,12 @@ export default function App() {
         const parsed = JSON.parse(e.target.result);
         if (parsed && parsed.predictions) {
           setImportedData(parsed);
-          setView('resultados'); // Muda automaticamente para a aba de resultados após carregar
+          setView('resultados');
         } else {
           alert('Arquivo JSON inválido ou sem palpites estruturados.');
         }
       } catch (error) {
-        alert('Erro ao ler o arquivo. Certifique-se de que é um JSON válido.');
+        alert('Erro ao ler o arquivo.');
       }
     };
     reader.readAsText(file);
@@ -272,7 +288,6 @@ export default function App() {
   }
 
   function exportPdf() {
-    const currentGames = games;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -283,7 +298,7 @@ export default function App() {
       gold: [255, 184, 28], cream: [248, 245, 236], text: [20, 24, 31], muted: [96, 102, 114]
     };
 
-    const allSections = groupBySection(currentGames);
+    const allSections = groupBySection(allGames);
     Object.entries(allSections).forEach(([sectionName, sectionGames], sectionIndex) => {
       if (sectionIndex > 0) doc.addPage();
 
@@ -299,7 +314,7 @@ export default function App() {
 
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
       doc.text(name ? `Participante: ${name}` : 'Participante: ______________________________', margin, 27);
-      doc.text(`${completed}/${currentGames.length} jogos preenchidos`, margin, 34);
+      doc.text(`${completed}/${allGames.length} jogos preenchidos`, margin, 34);
 
       drawRoundedRect(doc, pageWidth - 64, 12, 50, 18, 4, colors.gold, null);
       doc.setTextColor(...colors.navy); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
@@ -349,7 +364,7 @@ export default function App() {
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 14;
 
-    const allSections = groupBySection(games);
+    const allSections = groupBySection(activeGames);
     Object.entries(allSections).forEach(([sectionName, sectionGames], sectionIndex) => {
       if (sectionIndex > 0) doc.addPage();
 
@@ -417,11 +432,11 @@ export default function App() {
         <div className="hero-copy">
           <span className="eyebrow">Bolão oficial da galera</span>
           <h1>Bolão Copa 2026</h1>
-          <p>Preencha seus palpites jogo a jogo para a fase de grupos da Copa do Mundo de 2026. Você pode exportar seus palpites como imagem (png), pdf, ou como dados - para fazer a contagem de pontos futuramente.</p>
+          <p>Preencha seus palpites jogo a jogo para a Copa do Mundo de 2026. Você pode exportar seus palpites como imagem (png), pdf, ou como dados.</p>
         </div>
         <div className="score-card">
           <strong>{completed}</strong>
-          <span>de {games.length} jogos preenchidos</span>
+          <span>de {allGames.length} jogos preenchidos</span>
         </div>
       </header>
 
@@ -429,74 +444,77 @@ export default function App() {
         <button className={`tab-button ${view === 'palpites' ? 'active' : ''}`} onClick={() => setView('palpites')} >
           Meus Palpites
         </button>
-        <button className={`tab-button ${view === 'resultados' ? 'active' : ''}`} onClick={() => setView('resultados')} disabled>
-          Resultados e Pontuação | EM PREVE
+        <button className={`tab-button ${view === 'resultados' ? 'active' : ''}`} onClick={() => setView('resultados')}>
+          Resultados e Pontuação
         </button>
       </div>
 
+      <section className="controls">
+        <label>Nome do participante
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex.: João" />
+        </label>
+        <label>Buscar jogo
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Brasil, final, Grupo A..." />
+        </label>
+        <label>Fase
+          <select value={phaseFilter} onChange={(e) => { setPhaseFilter(e.target.value); setRoundFilter('Todos'); }}>
+            {phases.map((phase) => <option key={phase} value={phase}>{phase}</option>)}
+          </select>
+        </label>
+        <label>Rodada
+          <select value={roundFilter} onChange={(e) => setRoundFilter(e.target.value)}>
+            {rounds.map((round) => <option key={round} value={round}>{round}</option>)}
+          </select>
+        </label>
+
+        <div className="buttons">
+          <button className="primary" onClick={exportPdf}>Baixar PDF</button>
+          <button className="primary" onClick={exportImage} style={{ background: 'linear-gradient(135deg, #009d57, #34b373)' }}>Baixar Imagem</button>
+          <button className="primary" onClick={exportJson} style={{ background: 'linear-gradient(135deg, #6c5ce7, #a29bfe)', color: '#fff' }}>Exportar dados</button>
+          <button className="secondary" onClick={clearAll}>Limpar</button>
+        </div>
+      </section>
+
       {view === 'palpites' && (
-        <>
-          <section className="controls">
-            <label>Nome do participante
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex.: João" />
-            </label>
-            <label>Buscar jogo
-              <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Brasil, final, Grupo A..." />
-            </label>
-            <label>Fase
-              <select value={phaseFilter} onChange={(e) => setPhaseFilter(e.target.value)}>
-                {phases.map((phase) => <option key={phase} value={phase}>{phase}</option>)}
-              </select>
-            </label>
-
-            <div className="buttons">
-              <button className="primary" onClick={exportPdf}>Baixar PDF</button>
-              <button className="primary" onClick={exportImage} style={{ background: 'linear-gradient(135deg, #009d57, #34b373)' }}>Baixar Imagem</button>
-              <button className="primary" onClick={exportJson} style={{ background: 'linear-gradient(135deg, #6c5ce7, #a29bfe)', color: '#fff' }}>Exportar arquivo de dados</button>
-              <button className="secondary" onClick={clearAll}>Limpar</button>
+        <section className="export-area">
+          <div className="export-header">
+            <div>
+              <span className="eyebrow">Copa do Mundo FIFA 2026</span>
+              <h2>{name ? `Palpites de ${name}` : 'Meus palpites'}</h2>
             </div>
-          </section>
+            <div className="badge">{completed}/{allGames.length}</div>
+          </div>
 
-          <section className="export-area">
-            <div className="export-header">
-              <div>
-                <span className="eyebrow">Copa do Mundo FIFA 2026</span>
-                <h2>{name ? `Palpites de ${name}` : 'Meus palpites'}</h2>
+          {Object.entries(sections).map(([section, sectionGames]) => (
+            <section className="phase" key={section}>
+              <h3>{section}</h3>
+              <div className="games-grid">
+                {sectionGames.map((game) => {
+                  const prediction = predictions[game.id] || emptyPrediction();
+                  return (
+                    <article className="game-card" key={game.id}>
+                      <div className="game-meta">
+                        <span>Jogo {game.matchNumber}</span>
+                        <span>{formatDate(game.date)} · {game.time}</span>
+                      </div>
+                      <div className="teams">
+                        <span className="team"><TeamName name={game.home} /></span>
+                        <input aria-label={`Palpite ${game.home}`} value={prediction.home} onChange={(e) => updatePrediction(game.id, 'home', e.target.value)} inputMode="numeric" placeholder="0" />
+                        <strong>x</strong>
+                        <input aria-label={`Palpite ${game.away}`} value={prediction.away} onChange={(e) => updatePrediction(game.id, 'away', e.target.value)} inputMode="numeric" placeholder="0" />
+                        <span className="team right"><TeamName name={game.away} align="right" /></span>
+                      </div>
+                      <div className="stadium">
+                        {game.group && <span>{game.group}</span>}
+                        <span>{game.stadium}</span>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
-              <div className="badge">{completed}/{games.length}</div>
-            </div>
-
-            {Object.entries(sections).map(([section, sectionGames]) => (
-              <section className="phase" key={section}>
-                <h3>{section}</h3>
-                <div className="games-grid">
-                  {sectionGames.map((game) => {
-                    const prediction = predictions[game.id] || emptyPrediction();
-                    return (
-                      <article className="game-card" key={game.id}>
-                        <div className="game-meta">
-                          <span>Jogo {game.matchNumber}</span>
-                          <span>{formatDate(game.date)} · {game.time}</span>
-                        </div>
-                        <div className="teams">
-                          <span className="team"><TeamName name={game.home} /></span>
-                          <input aria-label={`Palpite ${game.home}`} value={prediction.home} onChange={(e) => updatePrediction(game.id, 'home', e.target.value)} inputMode="numeric" placeholder="0" />
-                          <strong>x</strong>
-                          <input aria-label={`Palpite ${game.away}`} value={prediction.away} onChange={(e) => updatePrediction(game.id, 'away', e.target.value)} inputMode="numeric" placeholder="0" />
-                          <span className="team right"><TeamName name={game.away} align="right" /></span>
-                        </div>
-                        <div className="stadium">
-                          {game.group && <span>{game.group}</span>}
-                          <span>{game.stadium}</span>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
-              </section>
-            ))}
-          </section>
-        </>
+            </section>
+          ))}
+        </section>
       )}
 
       {view === 'resultados' && (
@@ -510,6 +528,15 @@ export default function App() {
               <button className="secondary" onClick={() => setImportedData(null)}>Limpar Importação</button>
             )}
             <button className="primary" onClick={exportResultsPdf}>Baixar PDF de Resultados</button>
+          </div>
+
+          <div className="scoring-info">
+            <h4>Como funciona a pontuação:</h4>
+            <ul>
+              <li><strong>3 Pontos:</strong> Placar exato</li>
+              <li><strong>1 Ponto:</strong> Acertou o vencedor ou empate</li>
+              <li><strong>0 Pontos:</strong> Errou o resultado</li>
+            </ul>
           </div>
 
           <div className="export-header">
@@ -576,7 +603,7 @@ export default function App() {
             </div>
             <div className="header-stats">
               <strong>{completed}</strong>
-              <span>de {games.length} jogos</span>
+              <span>de {allGames.length} jogos</span>
             </div>
           </header>
 
